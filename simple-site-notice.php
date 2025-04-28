@@ -17,11 +17,13 @@ function ssn_register_settings() {
     add_option('ssn_background_color', '#fffbcc');
     add_option('ssn_text_color', '#333333');
     add_option('ssn_fixed', 0);
+    add_option('ssn_notice_position', 'footer'); // Default to footer
 
     register_setting('ssn_options_group', 'ssn_notice_text');
     register_setting('ssn_options_group', 'ssn_background_color');
     register_setting('ssn_options_group', 'ssn_text_color');
     register_setting('ssn_options_group', 'ssn_fixed');
+    register_setting('ssn_options_group', 'ssn_notice_position'); // Register the position option
 }
 add_action('admin_init', 'ssn_register_settings');
 
@@ -45,15 +47,24 @@ function ssn_options_page() {
                 </tr>
                 <tr valign="top">
                     <th scope="row">Background Color</th>
-                    <td><input type="text" name="ssn_background_color" value="<?php echo esc_attr(get_option('ssn_background_color')); ?>" class="regular-text" placeholder="#ffffff" /></td>
+                    <td><input type="color" name="ssn_background_color" value="<?php echo esc_attr(get_option('ssn_background_color')); ?>" /></td>
                 </tr>
                 <tr valign="top">
                     <th scope="row">Text Color</th>
-                    <td><input type="text" name="ssn_text_color" value="<?php echo esc_attr(get_option('ssn_text_color')); ?>" class="regular-text" placeholder="#000000" /></td>
+                    <td><input type="color" name="ssn_text_color" value="<?php echo esc_attr(get_option('ssn_text_color')); ?>" /></td>
                 </tr>
                 <tr valign="top">
                     <th scope="row">Fixed Position?</th>
                     <td><input type="checkbox" name="ssn_fixed" value="1" <?php checked(1, get_option('ssn_fixed'), true); ?> /> Stick to top of the screen</td>
+                </tr>
+                <tr valign="top">
+                    <th scope="row">Notice Position</th>
+                    <td>
+                        <select name="ssn_notice_position">
+                            <option value="header" <?php selected('header', get_option('ssn_notice_position')); ?>>Header</option>
+                            <option value="footer" <?php selected('footer', get_option('ssn_notice_position')); ?>>Footer</option>
+                        </select>
+                    </td>
                 </tr>
             </table>
             <?php submit_button(); ?>
@@ -68,12 +79,18 @@ function ssn_display_notice() {
     $background_color = get_option('ssn_background_color');
     $text_color = get_option('ssn_text_color');
     $fixed = get_option('ssn_fixed') ? 'position: fixed; top: 0; left: 0; width: 100%; z-index: 9999;' : '';
+    $position = get_option('ssn_notice_position', 'footer'); // Default to footer
 
-    echo '<div style="background-color: ' . esc_attr($background_color) . '; color: ' . esc_attr($text_color) . '; padding: 10px; text-align: center;' . $fixed . '">';
-    echo $notice_text;
-    echo '</div>';
+    $style = 'background-color: ' . esc_attr($background_color) . '; color: ' . esc_attr($text_color) . '; padding: 10px; text-align: center;' . $fixed;
+    
+    if ($position === 'header') {
+        echo '<div style="' . $style . '">' . $notice_text . '</div>';
+    } else {
+        echo '<div style="' . $style . '">' . $notice_text . '</div>';
+    }
 }
-add_action('wp_footer', 'ssn_display_notice');
+add_action('wp_footer', 'ssn_display_notice'); // In the footer
+add_action('wp_head', 'ssn_display_notice');   // In the header, if selected
 
 // Add Settings and Donate links on plugins list
 add_filter('plugin_action_links_' . plugin_basename(__FILE__), function ($links) {
