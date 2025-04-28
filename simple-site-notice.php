@@ -1,10 +1,11 @@
 <?php
-/*
-Plugin Name: Simple Site Notice
-Description: Display a simple, customizable notice banner on your site. Support development on BuyMeACoffee ☕
-Version: 1.1
-Author: Make Your Web
-Author URI: https://buymeacoffee.com/makeyourweb
+/**
+* Plugin Name: Simple Site Notice
+* Description: Display a customizable notice banner on your WordPress site. Supports HTML, custom colors, and sticky (fixed) option.
+* Version: 1.1
+* Author: Make Your Web
+* Author URI: https://buymeacoffee.com/makeyourweb
+* License: GPL v2 or later
 */
 
 if (!defined('ABSPATH')) {
@@ -19,11 +20,17 @@ function ssn_register_settings() {
     add_option('ssn_fixed', 0);
     add_option('ssn_notice_position', 'footer'); // Default to footer
 
-    register_setting('ssn_options_group', 'ssn_notice_text');
-    register_setting('ssn_options_group', 'ssn_background_color');
-    register_setting('ssn_options_group', 'ssn_text_color');
-    register_setting('ssn_options_group', 'ssn_fixed');
-    register_setting('ssn_options_group', 'ssn_notice_position'); // Register the position option
+    $args = array(
+        'type' => 'string', 
+        'sanitize_callback' => 'sanitize_text_field',
+        'default' => NULL,
+    );
+
+    register_setting('ssn_options_group', 'ssn_notice_text', $args);
+    register_setting('ssn_options_group', 'ssn_background_color', $args);
+    register_setting('ssn_options_group', 'ssn_text_color', $args);
+    register_setting('ssn_options_group', 'ssn_fixed', $args);
+    register_setting('ssn_options_group', 'ssn_notice_position', $args); // Register the position option
 }
 add_action('admin_init', 'ssn_register_settings');
 
@@ -78,19 +85,47 @@ function ssn_display_notice() {
     $notice_text = get_option('ssn_notice_text');
     $background_color = get_option('ssn_background_color');
     $text_color = get_option('ssn_text_color');
-    $fixed = get_option('ssn_fixed') ? 'position: fixed; top: 0; left: 0; width: 100%; z-index: 9999;' : '';
     $position = get_option('ssn_notice_position', 'footer'); // Default to footer
 
-    $style = 'background-color: ' . esc_attr($background_color) . '; color: ' . esc_attr($text_color) . '; padding: 10px; text-align: center;' . $fixed;
-    
     if ($position === 'header') {
-        echo '<div style="' . $style . '">' . $notice_text . '</div>';
-    } else {
-        echo '<div style="' . $style . '">' . $notice_text . '</div>';
+        $fixed = get_option('ssn_fixed') ? 'position: fixed; top: 0; left: 0; width: 100%; z-index: 9999;' : '';
+    } elseif ($position === 'footer') {
+        $fixed = get_option('ssn_fixed') ? 'position: fixed; bottom: 0; left: 0; width: 100%; z-index: 9999;' : '';
+    }
+
+    // Style for the notice
+    $style = 'background-color: ' . esc_attr($background_color) . '; color: ' . esc_attr($text_color) . '; padding: 10px; text-align: center;' . $fixed;
+
+    $allowed_html = array(
+        'a' => array(
+            'href' => array(),
+            'title' => array(),
+            '_blank' => array(),
+        ),
+        'span' => array(),
+    );
+
+    // Display the notice in the chosen position
+    if ($position === 'header') {
+        // Only add the notice in the header
+        echo '<div style="' . esc_attr($style) . '">' . wp_kses($notice_text, $allowed_html) . '</div>';
+    } elseif ($position === 'footer') {
+        // Only add the notice in the footer
+        echo '<div style="' . esc_attr($style) . '">' . wp_kses($notice_text, $allowed_html) . '</div>';
     }
 }
-add_action('wp_footer', 'ssn_display_notice'); // In the footer
-add_action('wp_head', 'ssn_display_notice');   // In the header, if selected
+
+// Only load the notice in header or footer based on the selected option
+function ssn_add_notice_to_correct_position() {
+    $position = get_option('ssn_notice_position', 'footer'); // Default to footer
+    
+    if ($position === 'header') {
+        add_action('wp_head', 'ssn_display_notice');
+    } else {
+        add_action('wp_footer', 'ssn_display_notice');
+    }
+}
+add_action('wp', 'ssn_add_notice_to_correct_position'); // Add action to load the notice in the correct position
 
 // Add Settings and Donate links on plugins list
 add_filter('plugin_action_links_' . plugin_basename(__FILE__), function ($links) {
