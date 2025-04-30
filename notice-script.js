@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 message.style.color = data.success ? 'green' : 'red';
                 form.querySelector('table').appendChild(message);
 
-                setTimeout(location.reload(), 3000);
+                // setTimeout(location.reload(), 3000);
             })
             .finally(() => {
                 // Ukryj spinner
