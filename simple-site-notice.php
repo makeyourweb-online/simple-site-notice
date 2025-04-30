@@ -76,6 +76,8 @@ function ssn_options_page() {
             </table>
             <?php submit_button(); ?>
         </form>
+        <hr>
+        <p>Support this plugin: <a href="https://buymeacoffee.com/makeyourweb" target="_blank">Buy me a coffee</a> ☕ | <a href="https://github.com/sponsors/makeyourweb" target="_blank">Sponsor on GitHub</a> ❤️</p>
     </div>
 <?php
 }
