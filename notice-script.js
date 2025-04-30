@@ -8,10 +8,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
             const licenseKey = form.querySelector('input[name="ssn_license_key"]').value;
 
-            // Pokaż spinner
+            // Show spinner
             spinner.style.visibility = 'visible';
 
-            // Usuń stare komunikaty
+            // Remove old license info
             const oldMessage = form.querySelector('.ssn-license-message');
             if (oldMessage) oldMessage.remove();
 
@@ -28,17 +28,26 @@ document.addEventListener('DOMContentLoaded', function () {
             })
             .then(response => response.json())
             .then(data => {
-                console.log(data.data.data);
-                const message = document.createElement('p');
-                message.className = 'ssn-license-message';
-                message.innerHTML = `<strong>${data.data.data}</strong>`;
-                message.style.color = data.success ? 'green' : 'red';
-                form.querySelector('table').appendChild(message);
-
-                // setTimeout(location.reload(), 3000);
+                if (data == 0) {
+                    const message = document.createElement('p');
+                    message.className = 'ssn-license-message';
+                    message.innerHTML = `<strong>Invalid license key.</strong>`;
+                    message.style.color = data.success ? 'green' : 'red';
+                    form.querySelector('table').appendChild(message);
+    
+                    setTimeout(location.reload(), 3000);
+                } else {
+                    const message = document.createElement('p');
+                    message.className = 'ssn-license-message';
+                    message.innerHTML = `<strong>${data.data.data}</strong>`;
+                    message.style.color = data.success ? 'green' : 'red';
+                    form.querySelector('table').appendChild(message);
+    
+                    setTimeout(location.reload(), 3000);
+                }
             })
             .finally(() => {
-                // Ukryj spinner
+                // Hide spinner
                 spinner.style.visibility = 'hidden';
             });
         });

@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Simple Site Notice
  * Description: Display a customizable notice banner on your WordPress site. Supports HTML, custom colors, and sticky (fixed) option.
- * Version: 1.1.1
+ * Version: 1.1.2
  * Author: MakeYourWeb
  * Author URI: https://plugins.makeyourweb.online/
  * License: GPL v2 or later
@@ -20,6 +20,7 @@ function ssn_register_settings()
     add_option('ssn_background_color', '#fffbcc');
     add_option('ssn_text_color', '#333333');
     add_option('ssn_font_size', '16px');
+    add_option('ssn_padding', '10px 15px');
     add_option('ssn_fixed', 0);
     add_option('ssn_notice_position', 'footer'); // Default to footer
 
@@ -33,13 +34,14 @@ function ssn_register_settings()
     register_setting('ssn_options_group', 'ssn_notice_text', $args);
     register_setting('ssn_options_group', 'ssn_background_color', $args);
     register_setting('ssn_options_group', 'ssn_text_color', $args);
+    register_setting('ssn_options_group', 'ssn_font_size', $args);
+    register_setting('ssn_options_group', 'ssn_padding', $args);
     register_setting('ssn_options_group', 'ssn_fixed', $args);
     register_setting('ssn_options_group', 'ssn_notice_position', $args); // Register the position option
 
     // Add JS
     add_action('admin_enqueue_scripts', function ($hook) {
-        if ($hook !== 'settings_page_simple-site-notice')
-            return;
+        if (strpos($hook, 'simple-site-notice') === false) return;
 
         wp_enqueue_script(
             'ssn-admin-script',
@@ -64,7 +66,15 @@ add_action('admin_init', 'ssn_register_settings');
 // Add settings page
 function ssn_register_options_page()
 {
-    add_options_page('Simple Site Notice', 'Simple Site Notice', 'manage_options', 'simple-site-notice', 'ssn_options_page');
+    add_menu_page(
+        'Simple Site Notice Settings',
+        'Simple Site Notice',
+        'manage_options',
+        'simple-site-notice',
+        'ssn_options_page',
+        'dashicons-megaphone',
+        80
+    );
 }
 add_action('admin_menu', 'ssn_register_options_page');
 
@@ -103,6 +113,12 @@ function ssn_options_page()
                             <?php if (!get_option('ssn_license_valid')): ?>disabled<?php endif; ?> /></td>
                 </tr>
                 <tr valign="top">
+                    <th scope="row">Padding <?php if (!get_option('ssn_license_valid')): ?>🔒 <i>(PRO
+                                Version)</i><?php endif; ?></th>
+                    <td><input type="text" name="ssn_padding" value="<?php echo esc_attr(get_option('ssn_padding')); ?>" placeholder="e.g., 10px 20px"
+                            <?php if (!get_option('ssn_license_valid')): ?>disabled<?php endif; ?> /></td>
+                </tr>
+                <tr valign="top">
                     <th scope="row">Fixed Position?</th>
                     <td><input type="checkbox" name="ssn_fixed" value="1" <?php checked(1, get_option('ssn_fixed'), true); ?> /> Stick to top of the screen</td>
                 </tr>
@@ -121,12 +137,21 @@ function ssn_options_page()
             <?php submit_button(); ?>
         </form>
         <hr>
+            <p>Support this plugin: <a href="https://buymeacoffee.com/makeyourweb" target="_blank">Buy me a coffee</a> ☕ | <a
+            href="https://github.com/sponsors/makeyourweb" target="_blank">Sponsor on GitHub</a> ❤️</p>
+            
+            <h3>Have an idea for a new feature in the free version?</h3>
+            <strong>One donation (minimum $7) = one new option added just for you (and everyone else!).</strong><br>
+            Just let me know what you'd like to see via 
+            <a href="https://plugins.makeyourweb.online/contact/" target="_blank">this form</a> or email 
+            <a href="mailto:hello@makeyourweb.online">hello@makeyourweb.online</a>.</p>
+        <hr>
         <h2>License Activation</h2>
         <p>
             <a href="https://plugins.makeyourweb.online/product/simple-site-notice-pro/" target="_blank"
-                style="font-weight:600;color:red;font-size:18px;">GO PRO Version - only 4,99 $</a>
+                style="font-weight:600;color:red;font-size:18px;">GO PRO Version - only $4,99</a>
         </p>
-        <form method="post" action="options.php" id="license_key_form">
+        <form method="post" id="license_key_form">
             <table class="form-table">
                 <tr valign="top">
                     <th scope="row">License key</th>
@@ -140,9 +165,6 @@ function ssn_options_page()
             </table>
             <?php submit_button('Activate License'); ?>
         </form>
-        <hr>
-        <p>Support this plugin: <a href="https://buymeacoffee.com/makeyourweb" target="_blank">Buy me a coffee</a> ☕ | <a
-                href="https://github.com/sponsors/makeyourweb" target="_blank">Sponsor on GitHub</a> ❤️</p>
     </div>
     <?php
 }
@@ -165,7 +187,21 @@ function ssn_display_notice()
         }
 
         // Style for the notice
-        $style = 'background-color: ' . esc_attr($background_color) . '; color: ' . esc_attr($text_color) . '; padding: 10px; text-align: center;' . $fixed;
+        $style = 'background-color: ' . esc_attr($background_color) . '; color: ' . esc_attr($text_color) . '; text-align: center;' . $fixed;
+
+        if ( get_option('ssn_license_valid') ) {
+            $font_size = get_option('ssn_font_size', '16px');
+            $style .= "font-size: {$font_size};";
+        } else {
+            $style .= "font-size: 16px;";
+        }
+
+        if ( get_option('ssn_license_valid') ) {
+            $font_size = get_option('ssn_padding', '10px');
+            $style .= "padding: {$font_size};";
+        } else {
+            $style .= "padding: 10px;";
+        }
 
         $allowed_html = array(
             'a' => array(
@@ -184,8 +220,6 @@ function ssn_display_notice()
             // Only add the notice in the footer
             echo '<div style="' . esc_attr($style) . '">' . wp_kses($notice_text, $allowed_html) . '</div>';
         }
-    } else {
-        return;
     }
 }
 
@@ -204,6 +238,7 @@ function ssn_validate_license_ajax()
     }
 
     $license_key = sanitize_text_field(wp_unslash($_POST['license_key']));
+    $is_license_valid = false;
 
     // Basic Authentication credentials
     $username = 'ck_ab9f1b4674b762538c140a11ec163dc09910cb13';
@@ -221,13 +256,15 @@ function ssn_validate_license_ajax()
 
     // Check for errors
     if (is_wp_error($response)) {
-        wp_send_json_error(array('data' => 'License validation failed.'));
+        update_option('ssn_license_valid', $is_license_valid);
+        update_option('ssn_license_key', $license_key);
+
+        wp_send_json_error(array('data' => '<div class="notice notice-error"><p>Invalid license key.</p></div>'));
     }
 
     $body = wp_remote_retrieve_body($response);
     $data = json_decode($body, true);
 
-    $is_license_valid = false;
     if (!empty($data['success']) && $data['success'] === true) {
         $is_license_valid = true;
         update_option('ssn_license_valid', $is_license_valid);
@@ -238,7 +275,7 @@ function ssn_validate_license_ajax()
         update_option('ssn_license_valid', $is_license_valid);
         update_option('ssn_license_key', $license_key);
 
-        wp_send_json_error(array('data' => '<div class="notice notice-error"><p>Invalid license key.</p></div>'));
+        wp_send_json_error(array('data' => '<div class="notice notice-error"><p>Invalid license key.</p></div>'));        
     }
 }
 
