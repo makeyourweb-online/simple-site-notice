@@ -2,9 +2,9 @@
 /**
 * Plugin Name: Simple Site Notice
 * Description: Display a customizable notice banner on your WordPress site. Supports HTML, custom colors, and sticky (fixed) option.
-* Version: 1.1
-* Author: Make Your Web
-* Author URI: https://buymeacoffee.com/makeyourweb
+* Version: 1.1.0
+* Author: MakeYourWeb
+* Author URI: https://plugins.makeyourweb.online/
 * License: GPL v2 or later
 */
 
@@ -14,6 +14,7 @@ if (!defined('ABSPATH')) {
 
 // Register settings
 function ssn_register_settings() {
+    add_option('ssn_enale', 1);
     add_option('ssn_notice_text', 'This is your site notice!');
     add_option('ssn_background_color', '#fffbcc');
     add_option('ssn_text_color', '#333333');
@@ -26,6 +27,7 @@ function ssn_register_settings() {
         'default' => NULL,
     );
 
+    register_setting('ssn_options_group', 'ssn_enable', $args);
     register_setting('ssn_options_group', 'ssn_notice_text', $args);
     register_setting('ssn_options_group', 'ssn_background_color', $args);
     register_setting('ssn_options_group', 'ssn_text_color', $args);
@@ -48,6 +50,10 @@ function ssn_options_page() {
         <form method="post" action="options.php">
             <?php settings_fields('ssn_options_group'); ?>
             <table class="form-table">
+            <tr valign="top">
+                    <th scope="row">Enable notice</th>
+                    <td><input type="checkbox" name="ssn_enable" value="1" <?php checked(1, get_option('ssn_enable'), true); ?> /> Show notification on page</td>
+                </tr>
                 <tr valign="top">
                     <th scope="row">Notice Text (HTML allowed)</th>
                     <td><textarea name="ssn_notice_text" rows="5" cols="50"><?php echo esc_textarea(get_option('ssn_notice_text')); ?></textarea></td>
@@ -84,36 +90,42 @@ function ssn_options_page() {
 
 // Display the notice
 function ssn_display_notice() {
-    $notice_text = get_option('ssn_notice_text');
-    $background_color = get_option('ssn_background_color');
-    $text_color = get_option('ssn_text_color');
-    $position = get_option('ssn_notice_position', 'footer'); // Default to footer
+    $enable = get_option('ssn_enable');
 
-    if ($position === 'header') {
-        $fixed = get_option('ssn_fixed') ? 'position: fixed; top: 0; left: 0; width: 100%; z-index: 9999;' : '';
-    } elseif ($position === 'footer') {
-        $fixed = get_option('ssn_fixed') ? 'position: fixed; bottom: 0; left: 0; width: 100%; z-index: 9999;' : '';
-    }
+    if ($enable) {
+        $notice_text = get_option('ssn_notice_text');
+        $background_color = get_option('ssn_background_color');
+        $text_color = get_option('ssn_text_color');
+        $position = get_option('ssn_notice_position', 'footer'); // Default to footer
 
-    // Style for the notice
-    $style = 'background-color: ' . esc_attr($background_color) . '; color: ' . esc_attr($text_color) . '; padding: 10px; text-align: center;' . $fixed;
+        if ($position === 'header') {
+            $fixed = get_option('ssn_fixed') ? 'position: fixed; top: 0; left: 0; width: 100%; z-index: 9999;' : '';
+        } elseif ($position === 'footer') {
+            $fixed = get_option('ssn_fixed') ? 'position: fixed; bottom: 0; left: 0; width: 100%; z-index: 9999;' : '';
+        }
 
-    $allowed_html = array(
-        'a' => array(
-            'href' => array(),
-            'title' => array(),
-            '_blank' => array(),
-        ),
-        'span' => array(),
-    );
+        // Style for the notice
+        $style = 'background-color: ' . esc_attr($background_color) . '; color: ' . esc_attr($text_color) . '; padding: 10px; text-align: center;' . $fixed;
 
-    // Display the notice in the chosen position
-    if ($position === 'header') {
-        // Only add the notice in the header
-        echo '<div style="' . esc_attr($style) . '">' . wp_kses($notice_text, $allowed_html) . '</div>';
-    } elseif ($position === 'footer') {
-        // Only add the notice in the footer
-        echo '<div style="' . esc_attr($style) . '">' . wp_kses($notice_text, $allowed_html) . '</div>';
+        $allowed_html = array(
+            'a' => array(
+                'href' => array(),
+                'title' => array(),
+                '_blank' => array(),
+            ),
+            'span' => array(),
+        );
+
+        // Display the notice in the chosen position
+        if ($position === 'header') {
+            // Only add the notice in the header
+            echo '<div style="' . esc_attr($style) . '">' . wp_kses($notice_text, $allowed_html) . '</div>';
+        } elseif ($position === 'footer') {
+            // Only add the notice in the footer
+            echo '<div style="' . esc_attr($style) . '">' . wp_kses($notice_text, $allowed_html) . '</div>';
+        }
+    } else {
+        return;
     }
 }
 
