@@ -2,7 +2,7 @@
 /**
 * Plugin Name: Simple Site Notice
 * Description: Display a customizable notice banner on your WordPress site. Supports HTML, custom colors, and sticky (fixed) option.
-* Version: 1.1.0
+* Version: 1.1.1
 * Author: MakeYourWeb
 * Author URI: https://plugins.makeyourweb.online/
 * License: GPL v2 or later
@@ -90,7 +90,7 @@ function ssn_options_page() {
                     <td><input type="color" name="ssn_text_color" value="<?php echo esc_attr(get_option('ssn_text_color')); ?>" /></td>
                 </tr>
                 <tr valign="top">
-                    <th scope="row">Font size 🔒 <i>(Pro Version)</i></th>
+                    <th scope="row">Font size 🔒 <i>(PRO Version)</i></th>
                     <td><input type="text" name="ssn_font_size" value="<?php echo esc_attr(get_option('ssn_font_size')); ?>" <?php if (!get_option('ssn_license_valid')): ?>disabled<?php endif; ?> /></td>
                 </tr>
                 <tr valign="top">
@@ -112,7 +112,7 @@ function ssn_options_page() {
         <hr>
         <h2>License Activation</h2>
         <p>
-            <a href="https://plugins.makeyourweb.online/product/simple-site-notice-pro/" target="_blank" style="font-weight:600;color:red;font-size:18px;">GO PRO - only 4,99 $</a>
+            <a href="https://plugins.makeyourweb.online/product/simple-site-notice-pro/" target="_blank" style="font-weight:600;color:red;font-size:18px;">GO PRO Version - only 4,99 $</a>
         </p>
         <form method="post" action="options.php" id="license_key_form">
             <table class="form-table">
