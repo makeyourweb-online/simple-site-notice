@@ -1,5 +1,5 @@
-=== Simple Site Notice ===
-Contributors: makeyourweb
+# Simple Site Notice
+Contributors: makeyourwebonline
 Donate link: https://buymeacoffee.com/makeyourweb
 Tags: notice, banner, announcement, notification, top bar
 Requires at least: 5.0

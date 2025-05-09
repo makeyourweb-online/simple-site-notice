@@ -13,16 +13,16 @@ if (!defined('ABSPATH')) {
 }
 
 // Register settings
-function ssn_register_settings()
+function simsino_myw_register_settings()
 {
-    add_option('ssn_enale', 1);
-    add_option('ssn_notice_text', 'This is your site notice!');
-    add_option('ssn_background_color', '#fffbcc');
-    add_option('ssn_text_color', '#333333');
-    add_option('ssn_font_size', '16px');
-    add_option('ssn_padding', '10px 15px');
-    add_option('ssn_fixed', 0);
-    add_option('ssn_notice_position', 'footer'); // Default to footer
+    add_option('simsino_myw_enale', 1);
+    add_option('simsino_myw_notice_text', 'This is your site notice!');
+    add_option('simsino_myw_background_color', '#fffbcc');
+    add_option('simsino_myw_text_color', '#333333');
+    add_option('simsino_myw_font_size', '16px');
+    add_option('simsino_myw_padding', '10px 15px');
+    add_option('simsino_myw_fixed', 0);
+    add_option('simsino_myw_notice_position', 'footer'); // Default to footer
 
     $args = array(
         'type' => 'string',
@@ -30,14 +30,14 @@ function ssn_register_settings()
         'default' => NULL,
     );
 
-    register_setting('ssn_options_group', 'ssn_enable', $args);
-    register_setting('ssn_options_group', 'ssn_notice_text', $args);
-    register_setting('ssn_options_group', 'ssn_background_color', $args);
-    register_setting('ssn_options_group', 'ssn_text_color', $args);
-    register_setting('ssn_options_group', 'ssn_font_size', $args);
-    register_setting('ssn_options_group', 'ssn_padding', $args);
-    register_setting('ssn_options_group', 'ssn_fixed', $args);
-    register_setting('ssn_options_group', 'ssn_notice_position', $args); // Register the position option
+    register_setting('simsino_myw_options_group', 'simsino_myw_enable', $args);
+    register_setting('simsino_myw_options_group', 'simsino_myw_notice_text', $args);
+    register_setting('simsino_myw_options_group', 'simsino_myw_background_color', $args);
+    register_setting('simsino_myw_options_group', 'simsino_myw_text_color', $args);
+    register_setting('simsino_myw_options_group', 'simsino_myw_font_size', $args);
+    register_setting('simsino_myw_options_group', 'simsino_myw_padding', $args);
+    register_setting('simsino_myw_options_group', 'simsino_myw_fixed', $args);
+    register_setting('simsino_myw_options_group', 'simsino_myw_notice_position', $args); // Register the position option
 
     // Add JS
     add_action('admin_enqueue_scripts', function ($hook) {
@@ -51,84 +51,84 @@ function ssn_register_settings()
             true
         );
 
-        wp_localize_script('ssn-admin-script', 'ssn_ajax_object', [
+        wp_localize_script('ssn-admin-script', 'simsino_myw_ajax_object', [
             'ajax_url' => admin_url('admin-ajax.php'),
-            'nonce' => wp_create_nonce('ssn_ajax_nonce'),
+            'nonce' => wp_create_nonce('simsino_myw_ajax_nonce'),
         ]);
     });
 
     // Validate license
-    add_action('wp_ajax_ssn_validate_license', 'ssn_validate_license_ajax');
-    add_action('wp_ajax_nopriv_ssn_validate_license', 'ssn_validate_license_ajax');
+    add_action('wp_ajax_simsino_myw_validate_license', 'simsino_myw_validate_license_ajax');
+    add_action('wp_ajax_nopriv_simsino_myw_validate_license', 'simsino_myw_validate_license_ajax');
 }
-add_action('admin_init', 'ssn_register_settings');
+add_action('admin_init', 'simsino_myw_register_settings');
 
 // Add settings page
-function ssn_register_options_page()
+function simsino_myw_register_options_page()
 {
     add_menu_page(
         'Simple Site Notice Settings',
         'Simple Site Notice',
         'manage_options',
         'simple-site-notice',
-        'ssn_options_page',
+        'simsino_myw_options_page',
         'dashicons-megaphone',
         80
     );
 }
-add_action('admin_menu', 'ssn_register_options_page');
+add_action('admin_menu', 'simsino_myw_register_options_page');
 
 // Settings page content
-function ssn_options_page()
+function simsino_myw_options_page()
 {
     ?>
     <div class="wrap">
         <h1>Simple Site Notice Settings</h1>
         <form method="post" action="options.php">
-            <?php settings_fields('ssn_options_group'); ?>
+            <?php settings_fields('simsino_myw_options_group'); ?>
             <table class="form-table">
                 <tr valign="top">
                     <th scope="row">Enable notice</th>
-                    <td><input type="checkbox" name="ssn_enable" value="1" <?php checked(1, get_option('ssn_enable'), true); ?> /> Show notification on page</td>
+                    <td><input type="checkbox" name="simsino_myw_enable" value="1" <?php checked(1, get_option('simsino_myw_enable'), true); ?> /> Show notification on page</td>
                 </tr>
                 <tr valign="top">
                     <th scope="row">Notice Text (HTML allowed)</th>
-                    <td><textarea name="ssn_notice_text" rows="5"
-                            cols="50"><?php echo esc_textarea(get_option('ssn_notice_text')); ?></textarea></td>
+                    <td><textarea name="simsino_myw_notice_text" rows="5"
+                            cols="50"><?php echo esc_textarea(get_option('simsino_myw_notice_text')); ?></textarea></td>
                 </tr>
                 <tr valign="top">
                     <th scope="row">Background Color</th>
-                    <td><input type="color" name="ssn_background_color"
-                            value="<?php echo esc_attr(get_option('ssn_background_color')); ?>" /></td>
+                    <td><input type="color" name="simsino_myw_background_color"
+                            value="<?php echo esc_attr(get_option('simsino_myw_background_color')); ?>" /></td>
                 </tr>
                 <tr valign="top">
                     <th scope="row">Text Color</th>
-                    <td><input type="color" name="ssn_text_color"
-                            value="<?php echo esc_attr(get_option('ssn_text_color')); ?>" /></td>
+                    <td><input type="color" name="simsino_myw_text_color"
+                            value="<?php echo esc_attr(get_option('simsino_myw_text_color')); ?>" /></td>
                 </tr>
                 <tr valign="top">
-                    <th scope="row">Font size <?php if (!get_option('ssn_license_valid')): ?>🔒 <i>(PRO
+                    <th scope="row">Font size <?php if (!get_option('simsino_myw_license_valid')): ?>🔒 <i>(PRO
                                 Version)</i><?php endif; ?></th>
-                    <td><input type="text" name="ssn_font_size" value="<?php echo esc_attr(get_option('ssn_font_size')); ?>"
-                            <?php if (!get_option('ssn_license_valid')): ?>disabled<?php endif; ?> /></td>
+                    <td><input type="text" name="simsino_myw_font_size" value="<?php echo esc_attr(get_option('simsino_myw_font_size')); ?>" placeholder="e.g. 16px"
+                            <?php if (!get_option('simsino_myw_license_valid')): ?>disabled<?php endif; ?> /></td>
                 </tr>
                 <tr valign="top">
-                    <th scope="row">Padding <?php if (!get_option('ssn_license_valid')): ?>🔒 <i>(PRO
+                    <th scope="row">Padding <?php if (!get_option('simsino_myw_license_valid')): ?>🔒 <i>(PRO
                                 Version)</i><?php endif; ?></th>
-                    <td><input type="text" name="ssn_padding" value="<?php echo esc_attr(get_option('ssn_padding')); ?>" placeholder="e.g., 10px 20px"
-                            <?php if (!get_option('ssn_license_valid')): ?>disabled<?php endif; ?> /></td>
+                    <td><input type="text" name="simsino_myw_padding" value="<?php echo esc_attr(get_option('simsino_myw_padding')); ?>" placeholder="e.g. 10px 20px"
+                            <?php if (!get_option('simsino_myw_license_valid')): ?>disabled<?php endif; ?> /></td>
                 </tr>
                 <tr valign="top">
                     <th scope="row">Fixed Position?</th>
-                    <td><input type="checkbox" name="ssn_fixed" value="1" <?php checked(1, get_option('ssn_fixed'), true); ?> /> Stick to top of the screen</td>
+                    <td><input type="checkbox" name="simsino_myw_fixed" value="1" <?php checked(1, get_option('simsino_myw_fixed'), true); ?> /> Stick to top of the screen</td>
                 </tr>
                 <tr valign="top">
                     <th scope="row">Notice Position</th>
                     <td>
-                        <select name="ssn_notice_position">
-                            <option value="header" <?php selected('header', get_option('ssn_notice_position')); ?>>Header
+                        <select name="simsino_myw_notice_position">
+                            <option value="header" <?php selected('header', get_option('simsino_myw_notice_position')); ?>>Header
                             </option>
-                            <option value="footer" <?php selected('footer', get_option('ssn_notice_position')); ?>>Footer
+                            <option value="footer" <?php selected('footer', get_option('simsino_myw_notice_position')); ?>>Footer
                             </option>
                         </select>
                     </td>
@@ -156,8 +156,8 @@ function ssn_options_page()
                 <tr valign="top">
                     <th scope="row">License key</th>
                     <td>
-                        <input type="text" name="ssn_license_key"
-                            value="<?php echo esc_attr(get_option('ssn_license_key')); ?>"
+                        <input type="text" name="simsino_myw_license_key"
+                            value="<?php echo esc_attr(get_option('simsino_myw_license_key')); ?>"
                             placeholder="eg. XDE6-1Z2Q-1E24-1ZE1-CXE3-Q124" />
                         <span class="spinner" style="float: none; visibility: hidden;"></span>
                     </td>
@@ -170,34 +170,34 @@ function ssn_options_page()
 }
 
 // Display the notice
-function ssn_display_notice()
+function simsino_myw_display_notice()
 {
-    $enable = get_option('ssn_enable');
+    $enable = get_option('simsino_myw_enable');
 
     if ($enable) {
-        $notice_text = get_option('ssn_notice_text');
-        $background_color = get_option('ssn_background_color');
-        $text_color = get_option('ssn_text_color');
-        $position = get_option('ssn_notice_position', 'footer'); // Default to footer
+        $notice_text = get_option('simsino_myw_notice_text');
+        $background_color = get_option('simsino_myw_background_color');
+        $text_color = get_option('simsino_myw_text_color');
+        $position = get_option('simsino_myw_notice_position', 'footer'); // Default to footer
 
         if ($position === 'header') {
-            $fixed = get_option('ssn_fixed') ? 'position: fixed; top: 0; left: 0; width: 100%; z-index: 9999;' : '';
+            $fixed = get_option('simsino_myw_fixed') ? 'position: fixed; top: 0; left: 0; width: 100%; z-index: 9999;' : '';
         } elseif ($position === 'footer') {
-            $fixed = get_option('ssn_fixed') ? 'position: fixed; bottom: 0; left: 0; width: 100%; z-index: 9999;' : '';
+            $fixed = get_option('simsino_myw_fixed') ? 'position: fixed; bottom: 0; left: 0; width: 100%; z-index: 9999;' : '';
         }
 
         // Style for the notice
         $style = 'background-color: ' . esc_attr($background_color) . '; color: ' . esc_attr($text_color) . '; text-align: center;' . $fixed;
 
-        if ( get_option('ssn_license_valid') ) {
-            $font_size = get_option('ssn_font_size', '16px');
+        if ( get_option('simsino_myw_license_valid') ) {
+            $font_size = get_option('simsino_myw_font_size', '16px');
             $style .= "font-size: {$font_size};";
         } else {
             $style .= "font-size: 16px;";
         }
 
-        if ( get_option('ssn_license_valid') ) {
-            $font_size = get_option('ssn_padding', '10px');
+        if ( get_option('simsino_myw_license_valid') ) {
+            $font_size = get_option('simsino_myw_padding', '10px');
             $style .= "padding: {$font_size};";
         } else {
             $style .= "padding: 10px;";
@@ -224,11 +224,11 @@ function ssn_display_notice()
 }
 
 // Validate license
-function ssn_validate_license_ajax()
+function simsino_myw_validate_license_ajax()
 {
     if (
         !isset($_POST['_ajax_nonce']) ||
-        !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['_ajax_nonce'])), 'ssn_ajax_nonce')
+        !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['_ajax_nonce'])), 'simsino_myw_ajax_nonce')
     ) {
         wp_send_json_error('Security check failed.');
     }
@@ -256,8 +256,8 @@ function ssn_validate_license_ajax()
 
     // Check for errors
     if (is_wp_error($response)) {
-        update_option('ssn_license_valid', $is_license_valid);
-        update_option('ssn_license_key', $license_key);
+        update_option('simsino_myw_license_valid', $is_license_valid);
+        update_option('simsino_myw_license_key', $license_key);
 
         wp_send_json_error(array('data' => '<div class="notice notice-error"><p>Invalid license key.</p></div>'));
     }
@@ -267,30 +267,30 @@ function ssn_validate_license_ajax()
 
     if (!empty($data['success']) && $data['success'] === true) {
         $is_license_valid = true;
-        update_option('ssn_license_valid', $is_license_valid);
-        update_option('ssn_license_key', $license_key);
+        update_option('simsino_myw_license_valid', $is_license_valid);
+        update_option('simsino_myw_license_key', $license_key);
 
         wp_send_json_success(array('data' => '<div class="notice notice-success"><p>License is valid.</p></div>'));
     } else {
-        update_option('ssn_license_valid', $is_license_valid);
-        update_option('ssn_license_key', $license_key);
+        update_option('simsino_myw_license_valid', $is_license_valid);
+        update_option('simsino_myw_license_key', $license_key);
 
         wp_send_json_error(array('data' => '<div class="notice notice-error"><p>Invalid license key.</p></div>'));        
     }
 }
 
 // Only load the notice in header or footer based on the selected option
-function ssn_add_notice_to_correct_position()
+function simsino_myw_add_notice_to_correct_position()
 {
-    $position = get_option('ssn_notice_position', 'footer'); // Default to footer
+    $position = get_option('simsino_myw_notice_position', 'footer'); // Default to footer
 
     if ($position === 'header') {
-        add_action('wp_head', 'ssn_display_notice');
+        add_action('wp_head', 'simsino_myw_display_notice');
     } else {
-        add_action('wp_footer', 'ssn_display_notice');
+        add_action('wp_footer', 'simsino_myw_display_notice');
     }
 }
-add_action('wp', 'ssn_add_notice_to_correct_position'); // Add action to load the notice in the correct position
+add_action('wp', 'simsino_myw_add_notice_to_correct_position'); // Add action to load the notice in the correct position
 
 // Add Settings and Donate links on plugins list
 add_filter('plugin_action_links_' . plugin_basename(__FILE__), function ($links) {
