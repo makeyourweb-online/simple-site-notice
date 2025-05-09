@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
 function simsino_myw_register_settings()
 {
     add_option('simsino_myw_enale', 1);
-    add_option('simsino_myw_notice_text', 'This is your site notice! <a href="https://plugins.makeyourweb.online/product/simple-site-notice-pro/" target="_blank">GO PRO!</a>');
+    add_option('simsino_myw_notice_text', 'This is your site notice!');
     add_option('simsino_myw_background_color', '#fffbcc');
     add_option('simsino_myw_text_color', '#333333');
     add_option('simsino_myw_font_size', '16px');
@@ -85,16 +85,14 @@ function simsino_myw_options_page()
                             value="<?php echo esc_attr(get_option('simsino_myw_text_color')); ?>" /></td>
                 </tr>
                 <tr valign="top">
-                    <th scope="row">Font size 🔒 <i>(PRO
-                                Version)</i></th>
-                    <td><input type="text" name="simsino_myw_font_size" value="<?php echo esc_attr(get_option('simsino_myw_font_size')); ?>" placeholder="e.g. 16px"
-                            disabled /></td>
+                    <th scope="row">Font size </th>
+                    <td><input type="text" name="simsino_pro_myw_font_size" value="<?php echo esc_attr(get_option('simsino_pro_myw_font_size')); ?>" placeholder="e.g. 16px"
+                            /></td>
                 </tr>
                 <tr valign="top">
-                    <th scope="row">Padding 🔒 <i>(PRO
-                                Version)</i></th>
-                    <td><input type="text" name="simsino_myw_padding" value="<?php echo esc_attr(get_option('simsino_myw_padding')); ?>" placeholder="e.g. 10px 20px"
-                            disabled /></td>
+                    <th scope="row">Padding </th>
+                    <td><input type="text" name="simsino_pro_myw_padding" value="<?php echo esc_attr(get_option('simsino_pro_myw_padding')); ?>" placeholder="e.g. 10px 20px"
+                            /></td>
                 </tr>
                 <tr valign="top">
                     <th scope="row">Fixed Position?</th>
@@ -115,13 +113,15 @@ function simsino_myw_options_page()
             <?php submit_button(); ?>
         </form>
         <hr>
-            <p>Support this plugin: <a href="https://buymeacoffee.com/makeyourweb" target="_blank">Buy me a coffee</a> ☕ | <a
-            href="https://github.com/sponsors/makeyourweb" target="_blank">Sponsor on GitHub</a> ❤️</p>
+            <p>Support this plugin: <a href="https://buymeacoffee.com/makeyourweb" target="_blank">Buy me a coffee</a> ☕ 
+            <!-- | 
+            <a href="https://github.com/sponsors/makeyourweb" target="_blank">Sponsor on GitHub</a> ❤️ -->
+            </p>
             
             <h3>Have an idea for a new feature in the free version?</h3>
             <strong>One donation (minimum $7) = one new option added just for you (and everyone else!).</strong><br>
             Just let me know what you'd like to see via 
-            <a href="https://plugins.makeyourweb.online/contact/" target="_blank">this form</a> or email 
+            <a href="https://plugins.makeyourweb.online/new-feature/" target="_blank">this form</a> or email 
             <a href="mailto:hello@makeyourweb.online">hello@makeyourweb.online</a>.</p>
         <hr>
         <p>
@@ -141,6 +141,8 @@ function simsino_myw_display_notice()
         $notice_text = get_option('simsino_myw_notice_text');
         $background_color = get_option('simsino_myw_background_color');
         $text_color = get_option('simsino_myw_text_color');
+        $font_size = get_option('simsino_pro_myw_font_size');
+        $padding = get_option('simsino_pro_myw_padding');
         $position = get_option('simsino_myw_notice_position', 'footer'); // Default to footer
 
         if ($position === 'header') {
@@ -152,9 +154,9 @@ function simsino_myw_display_notice()
         // Style for the notice
         $style = 'background-color: ' . esc_attr($background_color) . '; color: ' . esc_attr($text_color) . '; text-align: center;' . $fixed;
 
-        $style .= "font-size: 16px;";
+        $style .= 'font-size: ' . esc_attr($font_size) .';';
 
-        $style .= "padding: 10px;";
+        $style .= 'padding: ' . esc_attr($padding) .';';
 
         $allowed_html = array(
             'a' => array(

@@ -4,7 +4,7 @@ Donate link: https://buymeacoffee.com/makeyourweb
 Tags: notice, banner, announcement, notification, top bar
 Requires at least: 5.0
 Tested up to: 6.8
-Stable tag: 1.1.2
+Stable tag: 1.1.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -50,11 +50,14 @@ Yes! Just enable the "Fixed Position" option in the settings.
 
 == Changelog ==
 
+= 1.1.3 =
+* Added font size and padding controls
+* Updated readme.txt with external service disclosure
+
 = 1.1.2 =
 * Improved compatibility with WordPress 6.8
 * Fixed minor CSS issues in admin panel
 * Enhanced sanitization of notice content
-* Refactored license validation handling for PRO version
 * Updated readme.txt with external service disclosure
 
 = 1.1.1 =
@@ -67,6 +70,9 @@ Yes! Just enable the "Fixed Position" option in the settings.
 * Initial release
 
 == Upgrade Notice ==
+
+= 1.1.3 =
+Adds font size and padding controls to the free version and improves overall compatibility.
 
 = 1.1 =
 Adds customization options for color, position, and HTML support.
