@@ -86,12 +86,12 @@ function simsino_myw_options_page()
                 </tr>
                 <tr valign="top">
                     <th scope="row">Font size </th>
-                    <td><input type="text" name="simsino_pro_myw_font_size" value="<?php echo esc_attr(get_option('simsino_pro_myw_font_size')); ?>" placeholder="e.g. 16px"
+                    <td><input type="text" name="simsino_myw_font_size" value="<?php echo esc_attr(get_option('simsino_myw_font_size')); ?>" placeholder="e.g. 16px"
                             /></td>
                 </tr>
                 <tr valign="top">
                     <th scope="row">Padding </th>
-                    <td><input type="text" name="simsino_pro_myw_padding" value="<?php echo esc_attr(get_option('simsino_pro_myw_padding')); ?>" placeholder="e.g. 10px 20px"
+                    <td><input type="text" name="simsino_myw_padding" value="<?php echo esc_attr(get_option('simsino_myw_padding')); ?>" placeholder="e.g. 10px 20px"
                             /></td>
                 </tr>
                 <tr valign="top">
@@ -123,11 +123,11 @@ function simsino_myw_options_page()
             Just let me know what you'd like to see via 
             <a href="https://plugins.makeyourweb.online/new-feature/" target="_blank">this form</a> or email 
             <a href="mailto:hello@makeyourweb.online">hello@makeyourweb.online</a>.</p>
-        <hr>
+        <!-- <hr>
         <p>
             <a href="https://plugins.makeyourweb.online/product/simple-site-notice-pro/" target="_blank"
                 style="font-weight:600;color:red;font-size:18px;">GO PRO Version - only $4,99</a>
-        </p>
+        </p> -->
     </div>
     <?php
 }
@@ -141,8 +141,8 @@ function simsino_myw_display_notice()
         $notice_text = get_option('simsino_myw_notice_text');
         $background_color = get_option('simsino_myw_background_color');
         $text_color = get_option('simsino_myw_text_color');
-        $font_size = get_option('simsino_pro_myw_font_size');
-        $padding = get_option('simsino_pro_myw_padding');
+        $font_size = get_option('simsino_myw_font_size');
+        $padding = get_option('simsino_myw_padding');
         $position = get_option('simsino_myw_notice_position', 'footer'); // Default to footer
 
         if ($position === 'header') {
