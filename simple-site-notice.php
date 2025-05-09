@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
 function simsino_myw_register_settings()
 {
     add_option('simsino_myw_enale', 1);
-    add_option('simsino_myw_notice_text', 'This is your site notice!');
+    add_option('simsino_myw_notice_text', 'This is your site notice! <a href="https://plugins.makeyourweb.online/product/simple-site-notice-pro/" target="_blank">GO PRO!</a>');
     add_option('simsino_myw_background_color', '#fffbcc');
     add_option('simsino_myw_text_color', '#333333');
     add_option('simsino_myw_font_size', '16px');
@@ -31,35 +31,13 @@ function simsino_myw_register_settings()
     );
 
     register_setting('simsino_myw_options_group', 'simsino_myw_enable', $args);
-    register_setting('simsino_myw_options_group', 'simsino_myw_notice_text', $args);
+    register_setting('simsino_myw_options_group', 'simsino_myw_notice_text', array('sanitize_callback' => 'wp_kses_post'));
     register_setting('simsino_myw_options_group', 'simsino_myw_background_color', $args);
     register_setting('simsino_myw_options_group', 'simsino_myw_text_color', $args);
     register_setting('simsino_myw_options_group', 'simsino_myw_font_size', $args);
     register_setting('simsino_myw_options_group', 'simsino_myw_padding', $args);
     register_setting('simsino_myw_options_group', 'simsino_myw_fixed', $args);
     register_setting('simsino_myw_options_group', 'simsino_myw_notice_position', $args); // Register the position option
-
-    // Add JS
-    add_action('admin_enqueue_scripts', function ($hook) {
-        if (strpos($hook, 'simple-site-notice') === false) return;
-
-        wp_enqueue_script(
-            'ssn-admin-script',
-            plugin_dir_url(__FILE__) . 'notice-script.js',
-            array('jquery'),
-            '1.0',
-            true
-        );
-
-        wp_localize_script('ssn-admin-script', 'simsino_myw_ajax_object', [
-            'ajax_url' => admin_url('admin-ajax.php'),
-            'nonce' => wp_create_nonce('simsino_myw_ajax_nonce'),
-        ]);
-    });
-
-    // Validate license
-    add_action('wp_ajax_simsino_myw_validate_license', 'simsino_myw_validate_license_ajax');
-    add_action('wp_ajax_nopriv_simsino_myw_validate_license', 'simsino_myw_validate_license_ajax');
 }
 add_action('admin_init', 'simsino_myw_register_settings');
 
@@ -107,20 +85,20 @@ function simsino_myw_options_page()
                             value="<?php echo esc_attr(get_option('simsino_myw_text_color')); ?>" /></td>
                 </tr>
                 <tr valign="top">
-                    <th scope="row">Font size <?php if (!get_option('simsino_myw_license_valid')): ?>🔒 <i>(PRO
-                                Version)</i><?php endif; ?></th>
+                    <th scope="row">Font size 🔒 <i>(PRO
+                                Version)</i></th>
                     <td><input type="text" name="simsino_myw_font_size" value="<?php echo esc_attr(get_option('simsino_myw_font_size')); ?>" placeholder="e.g. 16px"
-                            <?php if (!get_option('simsino_myw_license_valid')): ?>disabled<?php endif; ?> /></td>
+                            disabled /></td>
                 </tr>
                 <tr valign="top">
-                    <th scope="row">Padding <?php if (!get_option('simsino_myw_license_valid')): ?>🔒 <i>(PRO
-                                Version)</i><?php endif; ?></th>
+                    <th scope="row">Padding 🔒 <i>(PRO
+                                Version)</i></th>
                     <td><input type="text" name="simsino_myw_padding" value="<?php echo esc_attr(get_option('simsino_myw_padding')); ?>" placeholder="e.g. 10px 20px"
-                            <?php if (!get_option('simsino_myw_license_valid')): ?>disabled<?php endif; ?> /></td>
+                            disabled /></td>
                 </tr>
                 <tr valign="top">
                     <th scope="row">Fixed Position?</th>
-                    <td><input type="checkbox" name="simsino_myw_fixed" value="1" <?php checked(1, get_option('simsino_myw_fixed'), true); ?> /> Stick to top of the screen</td>
+                    <td><input type="checkbox" name="simsino_myw_fixed" value="1" <?php checked(1, get_option('simsino_myw_fixed'), true); ?> /> Stick to the screen</td>
                 </tr>
                 <tr valign="top">
                     <th scope="row">Notice Position</th>
@@ -146,25 +124,10 @@ function simsino_myw_options_page()
             <a href="https://plugins.makeyourweb.online/contact/" target="_blank">this form</a> or email 
             <a href="mailto:hello@makeyourweb.online">hello@makeyourweb.online</a>.</p>
         <hr>
-        <h2>License Activation</h2>
         <p>
             <a href="https://plugins.makeyourweb.online/product/simple-site-notice-pro/" target="_blank"
                 style="font-weight:600;color:red;font-size:18px;">GO PRO Version - only $4,99</a>
         </p>
-        <form method="post" id="license_key_form">
-            <table class="form-table">
-                <tr valign="top">
-                    <th scope="row">License key</th>
-                    <td>
-                        <input type="text" name="simsino_myw_license_key"
-                            value="<?php echo esc_attr(get_option('simsino_myw_license_key')); ?>"
-                            placeholder="eg. XDE6-1Z2Q-1E24-1ZE1-CXE3-Q124" />
-                        <span class="spinner" style="float: none; visibility: hidden;"></span>
-                    </td>
-                </tr>
-            </table>
-            <?php submit_button('Activate License'); ?>
-        </form>
     </div>
     <?php
 }
@@ -189,19 +152,9 @@ function simsino_myw_display_notice()
         // Style for the notice
         $style = 'background-color: ' . esc_attr($background_color) . '; color: ' . esc_attr($text_color) . '; text-align: center;' . $fixed;
 
-        if ( get_option('simsino_myw_license_valid') ) {
-            $font_size = get_option('simsino_myw_font_size', '16px');
-            $style .= "font-size: {$font_size};";
-        } else {
-            $style .= "font-size: 16px;";
-        }
+        $style .= "font-size: 16px;";
 
-        if ( get_option('simsino_myw_license_valid') ) {
-            $font_size = get_option('simsino_myw_padding', '10px');
-            $style .= "padding: {$font_size};";
-        } else {
-            $style .= "padding: 10px;";
-        }
+        $style .= "padding: 10px;";
 
         $allowed_html = array(
             'a' => array(
@@ -210,6 +163,9 @@ function simsino_myw_display_notice()
                 '_blank' => array(),
             ),
             'span' => array(),
+            'br' => array(),
+            'em' => array(),
+            'strong' => array(),
         );
 
         // Display the notice in the chosen position
@@ -220,62 +176,6 @@ function simsino_myw_display_notice()
             // Only add the notice in the footer
             echo '<div style="' . esc_attr($style) . '">' . wp_kses($notice_text, $allowed_html) . '</div>';
         }
-    }
-}
-
-// Validate license
-function simsino_myw_validate_license_ajax()
-{
-    if (
-        !isset($_POST['_ajax_nonce']) ||
-        !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['_ajax_nonce'])), 'simsino_myw_ajax_nonce')
-    ) {
-        wp_send_json_error('Security check failed.');
-    }
-
-    if (!isset($_POST['license_key'])) {
-        wp_send_json_error(array('data' => 'No license key provided.'));
-    }
-
-    $license_key = sanitize_text_field(wp_unslash($_POST['license_key']));
-    $is_license_valid = false;
-
-    // Basic Authentication credentials
-    $username = 'ck_ab9f1b4674b762538c140a11ec163dc09910cb13';
-    $password = 'cs_d2ca0fabcdae1b705c3e70530cdb49da2807dadd';
-
-    // API endpoint URL
-    $url = "https://plugins.makeyourweb.online/wp-json/lmfwc/v2/licenses/validate/" . urlencode($license_key);
-
-    // Perform the request
-    $response = wp_remote_get($url, array(
-        'headers' => array(
-            'Authorization' => 'Basic ' . base64_encode($username . ':' . $password),
-        ),
-    ));
-
-    // Check for errors
-    if (is_wp_error($response)) {
-        update_option('simsino_myw_license_valid', $is_license_valid);
-        update_option('simsino_myw_license_key', $license_key);
-
-        wp_send_json_error(array('data' => '<div class="notice notice-error"><p>Invalid license key.</p></div>'));
-    }
-
-    $body = wp_remote_retrieve_body($response);
-    $data = json_decode($body, true);
-
-    if (!empty($data['success']) && $data['success'] === true) {
-        $is_license_valid = true;
-        update_option('simsino_myw_license_valid', $is_license_valid);
-        update_option('simsino_myw_license_key', $license_key);
-
-        wp_send_json_success(array('data' => '<div class="notice notice-success"><p>License is valid.</p></div>'));
-    } else {
-        update_option('simsino_myw_license_valid', $is_license_valid);
-        update_option('simsino_myw_license_key', $license_key);
-
-        wp_send_json_error(array('data' => '<div class="notice notice-error"><p>Invalid license key.</p></div>'));        
     }
 }
 
