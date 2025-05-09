@@ -50,13 +50,20 @@ Yes! Just enable the "Fixed Position" option in the settings.
 
 == Changelog ==
 
-= 1.1 =
+= 1.1.2 =
+* Improved compatibility with WordPress 6.8
+* Fixed minor CSS issues in admin panel
+* Enhanced sanitization of notice content
+* Refactored license validation handling for PRO version
+* Updated readme.txt with external service disclosure
+
+= 1.1.1 =
 * Added option for fixed (sticky) notice
 * Added support for HTML in notice text
 * Added custom text color and background color options
 * Improved settings page
 
-= 1.0 =
+= 1.1.0 =
 * Initial release
 
 == Upgrade Notice ==
