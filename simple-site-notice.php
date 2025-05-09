@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Simple Site Notice
  * Description: Display a customizable notice banner on your WordPress site. Supports HTML, custom colors, and sticky (fixed) option.
- * Version: 1.1.2
+ * Version: 1.1.3
  * Author: MakeYourWeb
  * Author URI: https://plugins.makeyourweb.online/
  * License: GPL v2 or later
