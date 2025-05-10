@@ -1,8 +1,8 @@
 <?php
 /**
- * Plugin Name: Simple Site Notice
+ * Plugin Name: Simple Site Notice - Top Bar & Bottom Bar
  * Description: Display a customizable notice banner on your WordPress site. Supports HTML, custom colors, and sticky (fixed) option.
- * Version: 1.1.3
+ * Version: 1.1.4
  * Author: MakeYourWeb
  * Author URI: https://plugins.makeyourweb.online/
  * License: GPL v2 or later
@@ -37,6 +37,8 @@ function simsino_myw_register_settings()
     register_setting('simsino_myw_options_group', 'simsino_myw_font_size', $args);
     register_setting('simsino_myw_options_group', 'simsino_myw_padding', $args);
     register_setting('simsino_myw_options_group', 'simsino_myw_fixed', $args);
+    register_setting('simsino_myw_options_group', 'simsino_myw_only_desktop');
+    register_setting('simsino_myw_options_group', 'simsino_myw_custom_css');    
     register_setting('simsino_myw_options_group', 'simsino_myw_notice_position', $args); // Register the position option
 }
 add_action('admin_init', 'simsino_myw_register_settings');
@@ -56,6 +58,40 @@ function simsino_myw_register_options_page()
 }
 add_action('admin_menu', 'simsino_myw_register_options_page');
 
+// Styles
+add_action('admin_head', function () {
+    echo '<style>
+    input[type="checkbox"].simsino-toggle {
+        appearance: none;
+        width: 40px;
+        height: 20px;
+        background: #ccc;
+        border-radius: 10px;
+        position: relative;
+        outline: none;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+    input[type="checkbox"].simsino-toggle:checked {
+        background: #2c67b4;
+    }
+    input[type="checkbox"].simsino-toggle::before {
+        content: "";
+        position: absolute;
+        top: 1px;
+        left: 3px;
+        width: 16px;
+        height: 16px;
+        background: white;
+        border-radius: 50%;
+        transition: transform 0.3s;
+    }
+    input[type="checkbox"].simsino-toggle:checked::before {
+        transform: translate(20px, 3px);
+    }
+    </style>';
+});
+
 // Settings page content
 function simsino_myw_options_page()
 {
@@ -67,7 +103,7 @@ function simsino_myw_options_page()
             <table class="form-table">
                 <tr valign="top">
                     <th scope="row">Enable notice</th>
-                    <td><input type="checkbox" name="simsino_myw_enable" value="1" <?php checked(1, get_option('simsino_myw_enable'), true); ?> /> Show notification on page</td>
+                    <td><input type="checkbox" class="simsino-toggle" name="simsino_myw_enable" value="1" <?php checked(1, get_option('simsino_myw_enable'), true); ?> /> Show notification on page</td>
                 </tr>
                 <tr valign="top">
                     <th scope="row">Notice Text (HTML allowed)</th>
@@ -96,7 +132,22 @@ function simsino_myw_options_page()
                 </tr>
                 <tr valign="top">
                     <th scope="row">Fixed Position?</th>
-                    <td><input type="checkbox" name="simsino_myw_fixed" value="1" <?php checked(1, get_option('simsino_myw_fixed'), true); ?> /> Stick to the screen</td>
+                    <td><input type="checkbox" class="simsino-toggle" name="simsino_myw_fixed" value="1" <?php checked(1, get_option('simsino_myw_fixed'), true); ?> /> Stick to the screen</td>
+                </tr>
+                <tr valign="top">
+                    <th scope="row">Display only on desktop</th>
+                    <td>
+                        <input type="checkbox" class="simsino-toggle" name="simsino_myw_only_desktop" value="1" <?php checked(1, get_option('simsino_myw_only_desktop'), true); ?> />
+                        <label for="simsino_myw_only_desktop">Hide the notice bar on mobile devices (under 768px)</label>
+                    </td>
+                </tr>
+
+                <tr valign="top">
+                    <th scope="row">Custom CSS</th>
+                    <td>
+                        <textarea name="simsino_myw_custom_css" rows="5" cols="50" placeholder=".simsino-myw-notice { font-family: Arial; text-decoration: underline; }"><?php echo esc_textarea(get_option('simsino_myw_custom_css')); ?></textarea>
+                        <p class="description">Add custom CSS to style the notice bar (without &lt;style&gt; tags).</p>
+                    </td>
                 </tr>
                 <tr valign="top">
                     <th scope="row">Notice Position</th>
@@ -143,6 +194,8 @@ function simsino_myw_display_notice()
         $text_color = get_option('simsino_myw_text_color');
         $font_size = get_option('simsino_myw_font_size');
         $padding = get_option('simsino_myw_padding');
+        $only_desktop = get_option('simsino_myw_only_desktop');
+        $custom_css = get_option('simsino_myw_custom_css');
         $position = get_option('simsino_myw_notice_position', 'footer'); // Default to footer
 
         if ($position === 'header') {
@@ -173,11 +226,19 @@ function simsino_myw_display_notice()
         // Display the notice in the chosen position
         if ($position === 'header') {
             // Only add the notice in the header
-            echo '<div style="' . esc_attr($style) . '">' . wp_kses($notice_text, $allowed_html) . '</div>';
+            echo '<div class="simsino-myw-notice" style="' . esc_attr($style) . '">' . wp_kses($notice_text, $allowed_html) . '</div>';
         } elseif ($position === 'footer') {
             // Only add the notice in the footer
-            echo '<div style="' . esc_attr($style) . '">' . wp_kses($notice_text, $allowed_html) . '</div>';
+            echo '<div class="simsino-myw-notice" style="' . esc_attr($style) . '">' . wp_kses($notice_text, $allowed_html) . '</div>';
         }
+        echo '<style type="text/css">';
+        if ($only_desktop) {
+            echo '@media (max-width: 767px) { .simsino-myw-notice { display: none !important; } }';
+        }
+        if (!empty($custom_css)) {
+            echo $custom_css;
+        }
+        echo '</style>';
     }
 }
 

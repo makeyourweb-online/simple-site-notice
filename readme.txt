@@ -1,64 +1,78 @@
-# Simple Site Notice
+=== Simple Site Notice – Top Bar & Bottom Bar ===
 Contributors: makeyourwebonline
 Donate link: https://buymeacoffee.com/makeyourweb
-Tags: notice, banner, announcement, notification, top bar
+Tags: top bar, bottom bar, notice, banner, announcement
 Requires at least: 5.0
 Tested up to: 6.8
-Stable tag: 1.1.3
+Stable tag: 1.1.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Display a customizable notice banner on your WordPress site. Supports HTML, custom colors, and sticky (fixed) option.
+Display a customizable notice bar on your WordPress site – at the top or bottom of the screen. Supports HTML, custom colors, font size, padding, and custom CSS.
 
 == Description ==
 
-**Simple Site Notice** lets you display a customizable banner on your WordPress site, either fixed to the top of the screen or inline. 
-You can add announcements, promotions, HTML links, donation requests, or any message you like.
+**Simple Site Notice – Top Bar & Bottom Bar** lets you display a customizable notification banner on your WordPress site, either fixed to the top of the screen or placed inline at the bottom.
 
-- Use plain text or HTML in your notice
-- Choose background and text colors
-- Option to make the banner sticky (fixed)
-- Lightweight, no JavaScript required
-- Simple to configure — works out of the box!
+Perfect for cookie notices, promotions, announcements, donation requests, or any other message you want to highlight.
 
-Perfect for announcements, promotions, alerts, or encouraging donations!
+Key features:
+* Place the notice at the top or bottom of your site
+* Use plain text or HTML in your message
+* Choose background and text colors
+* Customize font size and padding
+* Add your own CSS styles (without `<style>` tags)
+* Option to hide the notice on mobile devices
+* Lightweight and clean – no JavaScript required
+* Works instantly – no setup complexity
 
 == Installation ==
 
 1. Upload the `simple-site-notice` folder to the `/wp-content/plugins/` directory.
-2. Activate the plugin through the 'Plugins' menu in WordPress.
+2. Activate the plugin through the "Plugins" menu in WordPress.
 3. Go to **Settings → Simple Site Notice** to customize your banner.
 
 == Frequently Asked Questions ==
 
 = Can I use HTML in the notice text? =
+Yes, you can safely use HTML like `<a>`, `<strong>`, `<em>`, and similar tags.
 
-Yes, you can safely add basic HTML like `<a>`, `<strong>`, `<em>`, etc.
+= Can I control the appearance (font size, spacing)? =
+Yes – there are dedicated options for font size and padding.
 
-= Can I choose my own colors? =
+= Can I hide the bar on mobile? =
+Yes – just enable the "Show only on desktop" checkbox in the settings.
 
-Yes! You can set any background and text color you like in the plugin settings.
+= Can I add custom styles? =
+Yes! Use the custom CSS textarea to add your own styling rules.  
+**Important:** Do not include `<style>` tags – just the raw CSS rules.
 
-= Can the banner be fixed to the top of the screen? =
+Example:
+`.simsino-myw-notice { font-family: Arial; border-radius: 10px; }`
 
-Yes! Just enable the "Fixed Position" option in the settings.
+= Can I place the bar at the bottom of the screen? =
+Yes – choose the "Bottom position" option in the plugin settings.
 
 == Screenshots ==
 
-1. Simple notice example
-2. Plugin settings screen
+1. Example notice bar at the top of a site
+2. Settings panel inside the WordPress dashboard
 
 == Changelog ==
 
+= 1.1.4 =
+* Added "Show only on desktop" option to hide the notice bar on mobile devices
+* Added support for custom CSS via a textarea field in plugin settings
+* Minor code refactoring for improved maintainability
+
 = 1.1.3 =
 * Added font size and padding controls
-* Updated readme.txt with external service disclosure
+* Updated readme.txt with external service disclosure (later deprecated)
 
 = 1.1.2 =
 * Improved compatibility with WordPress 6.8
 * Fixed minor CSS issues in admin panel
 * Enhanced sanitization of notice content
-* Updated readme.txt with external service disclosure
 
 = 1.1.1 =
 * Added option for fixed (sticky) notice
@@ -70,6 +84,9 @@ Yes! Just enable the "Fixed Position" option in the settings.
 * Initial release
 
 == Upgrade Notice ==
+
+= 1.1.4 =
+Adds option to hide notice on mobile and allows custom CSS styling via settings.
 
 = 1.1.3 =
 Adds font size and padding controls to the free version and improves overall compatibility.
