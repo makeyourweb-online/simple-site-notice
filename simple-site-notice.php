@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Simple Site Notice - Top Bar & Bottom Bar
  * Description: Display a customizable notice banner on your WordPress site. Supports HTML, custom colors, and sticky (fixed) option.
- * Version: 1.1.4
+ * Version: 1.2.0
  * Author: MakeYourWeb
  * Author URI: https://plugins.makeyourweb.online/
  * License: GPL v2 or later
@@ -15,7 +15,7 @@ if (!defined('ABSPATH')) {
 // Register settings
 function simsino_myw_register_settings()
 {
-    add_option('simsino_myw_enale', 1);
+    add_option('simsino_myw_enable', 1);
     add_option('simsino_myw_notice_text', 'This is your site notice!');
     add_option('simsino_myw_background_color', '#fffbcc');
     add_option('simsino_myw_text_color', '#333333');
@@ -23,6 +23,8 @@ function simsino_myw_register_settings()
     add_option('simsino_myw_padding', '10px 15px');
     add_option('simsino_myw_fixed', 0);
     add_option('simsino_myw_notice_position', 'footer'); // Default to footer
+    add_option('simsino_myw_enable_close', 1); // New: enable close button
+    add_option('simsino_myw_remember_close', 1); // New: remember close with cookie
 
     $args = array(
         'type' => 'string',
@@ -38,10 +40,31 @@ function simsino_myw_register_settings()
     register_setting('simsino_myw_options_group', 'simsino_myw_padding', $args);
     register_setting('simsino_myw_options_group', 'simsino_myw_fixed', $args);
     register_setting('simsino_myw_options_group', 'simsino_myw_only_desktop');
-    register_setting('simsino_myw_options_group', 'simsino_myw_custom_css');    
-    register_setting('simsino_myw_options_group', 'simsino_myw_notice_position', $args); // Register the position option
+    register_setting('simsino_myw_options_group', 'simsino_myw_custom_css');
+    register_setting('simsino_myw_options_group', 'simsino_myw_notice_position', $args);
+    register_setting('simsino_myw_options_group', 'simsino_myw_enable_close', $args); // New
+    register_setting('simsino_myw_options_group', 'simsino_myw_remember_close', $args); // New
 }
 add_action('admin_init', 'simsino_myw_register_settings');
+
+function simple_site_notice_enqueue_assets() {
+    // Only enqueue if notice is enabled and (if close is enabled) not closed via cookie
+    $enable = get_option('simsino_myw_enable');
+    $enable_close = get_option('simsino_myw_enable_close');
+    $remember_close = get_option('simsino_myw_remember_close');
+
+    if (!$enable) return;
+    if ($enable_close && $remember_close && isset($_COOKIE['simple_site_notice_closed'])) return;
+
+    wp_enqueue_style('simple-site-notice-css', plugins_url('simple-site-notice.css', __FILE__));
+    wp_enqueue_script('simple-site-notice-js', plugins_url('simple-site-notice.js', __FILE__), array(), false, true);
+
+    // Pass the remember_close option to JS
+    wp_localize_script('simple-site-notice-js', 'SimpleSiteNoticeSettings', array(
+        'rememberClose' => $remember_close ? true : false,
+    ));
+}
+add_action('wp_enqueue_scripts', 'simple_site_notice_enqueue_assets');
 
 // Add settings page
 function simsino_myw_register_options_page()
@@ -58,7 +81,7 @@ function simsino_myw_register_options_page()
 }
 add_action('admin_menu', 'simsino_myw_register_options_page');
 
-// Styles
+// Styles for toggle switches
 add_action('admin_head', function () {
     echo '<style>
     input[type="checkbox"].simsino-toggle {
@@ -141,7 +164,6 @@ function simsino_myw_options_page()
                         <label for="simsino_myw_only_desktop">Hide the notice bar on mobile devices (under 768px)</label>
                     </td>
                 </tr>
-
                 <tr valign="top">
                     <th scope="row">Custom CSS</th>
                     <td>
@@ -153,11 +175,23 @@ function simsino_myw_options_page()
                     <th scope="row">Notice Position</th>
                     <td>
                         <select name="simsino_myw_notice_position">
-                            <option value="header" <?php selected('header', get_option('simsino_myw_notice_position')); ?>>Header
-                            </option>
-                            <option value="footer" <?php selected('footer', get_option('simsino_myw_notice_position')); ?>>Footer
-                            </option>
+                            <option value="header" <?php selected('header', get_option('simsino_myw_notice_position')); ?>>Header</option>
+                            <option value="footer" <?php selected('footer', get_option('simsino_myw_notice_position')); ?>>Footer</option>
                         </select>
+                    </td>
+                </tr>
+                <tr valign="top">
+                    <th scope="row">Enable close button</th>
+                    <td>
+                        <input type="checkbox" class="simsino-toggle" name="simsino_myw_enable_close" value="1" <?php checked(1, get_option('simsino_myw_enable_close'), true); ?> />
+                        <label for="simsino_myw_enable_close">Allow users to close the notice bar</label>
+                    </td>
+                </tr>
+                <tr valign="top">
+                    <th scope="row">Remember closure with cookie</th>
+                    <td>
+                        <input type="checkbox" class="simsino-toggle" name="simsino_myw_remember_close" value="1" <?php checked(1, get_option('simsino_myw_remember_close'), true); ?> />
+                        <label for="simsino_myw_remember_close">Remember closed state with a cookie</label>
                     </td>
                 </tr>
             </table>
@@ -165,20 +199,12 @@ function simsino_myw_options_page()
         </form>
         <hr>
             <p>Support this plugin: <a href="https://buymeacoffee.com/makeyourweb" target="_blank">Buy me a coffee</a> ☕ 
-            <!-- | 
-            <a href="https://github.com/sponsors/makeyourweb" target="_blank">Sponsor on GitHub</a> ❤️ -->
             </p>
-            
             <h3>Have an idea for a new feature in the free version?</h3>
             <strong>One donation (minimum $7) = one new option added just for you (and everyone else!).</strong><br>
             Just let me know what you'd like to see via 
             <a href="https://plugins.makeyourweb.online/new-feature/" target="_blank">this form</a> or email 
             <a href="mailto:hello@makeyourweb.online">hello@makeyourweb.online</a>.</p>
-        <!-- <hr>
-        <p>
-            <a href="https://plugins.makeyourweb.online/product/simple-site-notice-pro/" target="_blank"
-                style="font-weight:600;color:red;font-size:18px;">GO PRO Version - only $4,99</a>
-        </p> -->
     </div>
     <?php
 }
@@ -186,8 +212,15 @@ function simsino_myw_options_page()
 // Display the notice
 function simsino_myw_display_notice()
 {
-    $enable = get_option('simsino_myw_enable');
+    $enable_close = get_option('simsino_myw_enable_close');
+    $remember_close = get_option('simsino_myw_remember_close');
 
+    // If remember_close is enabled and cookie is set, don't show the notice
+    if ($enable_close && $remember_close && isset($_COOKIE['simple_site_notice_closed'])) {
+        return;
+    }
+
+    $enable = get_option('simsino_myw_enable');
     if ($enable) {
         $notice_text = get_option('simsino_myw_notice_text');
         $background_color = get_option('simsino_myw_background_color');
@@ -196,26 +229,23 @@ function simsino_myw_display_notice()
         $padding = get_option('simsino_myw_padding');
         $only_desktop = get_option('simsino_myw_only_desktop');
         $custom_css = get_option('simsino_myw_custom_css');
-        $position = get_option('simsino_myw_notice_position', 'footer'); // Default to footer
+        $position = get_option('simsino_myw_notice_position', 'footer');
 
         if ($position === 'header') {
-            $fixed = get_option('simsino_myw_fixed') ? 'position: fixed; top: 0; left: 0; width: 100%; z-index: 9999;' : '';
+            $fixed = get_option('simsino_myw_fixed') ? 'position: fixed; top: 0; left: 0;' : '';
         } elseif ($position === 'footer') {
-            $fixed = get_option('simsino_myw_fixed') ? 'position: fixed; bottom: 0; left: 0; width: 100%; z-index: 9999;' : '';
+            $fixed = get_option('simsino_myw_fixed') ? 'position: fixed; bottom: 0; left: 0;' : '';
         }
 
-        // Style for the notice
         $style = 'background-color: ' . esc_attr($background_color) . '; color: ' . esc_attr($text_color) . '; text-align: center;' . $fixed;
-
-        $style .= 'font-size: ' . esc_attr($font_size) .';';
-
-        $style .= 'padding: ' . esc_attr($padding) .';';
+        $style .= 'font-size: ' . esc_attr($font_size) . ';';
+        $style .= 'padding: ' . esc_attr($padding) . ';';
 
         $allowed_html = array(
             'a' => array(
                 'href' => array(),
                 'title' => array(),
-                '_blank' => array(),
+                'target' => array(),
             ),
             'span' => array(),
             'br' => array(),
@@ -223,14 +253,19 @@ function simsino_myw_display_notice()
             'strong' => array(),
         );
 
-        // Display the notice in the chosen position
-        if ($position === 'header') {
-            // Only add the notice in the header
-            echo '<div class="simsino-myw-notice" style="' . esc_attr($style) . '">' . wp_kses($notice_text, $allowed_html) . '</div>';
-        } elseif ($position === 'footer') {
-            // Only add the notice in the footer
-            echo '<div class="simsino-myw-notice" style="' . esc_attr($style) . '">' . wp_kses($notice_text, $allowed_html) . '</div>';
+        $close_btn_html = '';
+        if ($enable_close) {
+            $close_btn_html = '<button class="simsino-myw-notice-close" aria-label="Close" style="margin-left:10px;">&times;</button>';
         }
+
+        $notice_html = '<div class="simsino-myw-notice" id="simsino-myw-notice" style="' . esc_attr($style) . '">' . wp_kses($notice_text, $allowed_html) . $close_btn_html . '</div>';
+
+        if ($position === 'header') {
+            echo $notice_html;
+        } elseif ($position === 'footer') {
+            echo $notice_html;
+        }
+
         echo '<style type="text/css">';
         if ($only_desktop) {
             echo '@media (max-width: 767px) { .simsino-myw-notice { display: none !important; } }';
@@ -245,15 +280,14 @@ function simsino_myw_display_notice()
 // Only load the notice in header or footer based on the selected option
 function simsino_myw_add_notice_to_correct_position()
 {
-    $position = get_option('simsino_myw_notice_position', 'footer'); // Default to footer
-
+    $position = get_option('simsino_myw_notice_position', 'footer');
     if ($position === 'header') {
         add_action('wp_head', 'simsino_myw_display_notice');
     } else {
         add_action('wp_footer', 'simsino_myw_display_notice');
     }
 }
-add_action('wp', 'simsino_myw_add_notice_to_correct_position'); // Add action to load the notice in the correct position
+add_action('wp', 'simsino_myw_add_notice_to_correct_position');
 
 // Add Settings and Donate links on plugins list
 add_filter('plugin_action_links_' . plugin_basename(__FILE__), function ($links) {

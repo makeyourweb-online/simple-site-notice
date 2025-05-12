@@ -4,11 +4,11 @@ Donate link: https://buymeacoffee.com/makeyourweb
 Tags: top bar, bottom bar, notice, banner, announcement
 Requires at least: 5.0
 Tested up to: 6.8
-Stable tag: 1.1.4
+Stable tag: 1.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Display a customizable notice bar on your WordPress site – at the top or bottom of the screen. Supports HTML, custom colors, font size, padding, and custom CSS.
+Display a customizable notification bar at the top or bottom of your site. Perfect for notices, promotions, or announcements.
 
 == Description ==
 
@@ -23,7 +23,9 @@ Key features:
 * Customize font size and padding
 * Add your own CSS styles (without `<style>` tags)
 * Option to hide the notice on mobile devices
-* Lightweight and clean – no JavaScript required
+* Option to enable a close button so users can dismiss the notice
+* Option to remember closure with a cookie (notice stays hidden after closing)
+* Lightweight and clean – no JavaScript required (unless close button is enabled)
 * Works instantly – no setup complexity
 
 == Installation ==
@@ -47,6 +49,12 @@ Yes – just enable the "Show only on desktop" checkbox in the settings.
 Yes! Use the custom CSS textarea to add your own styling rules.  
 **Important:** Do not include `<style>` tags – just the raw CSS rules.
 
+= Can I let users close the notice bar? =
+Yes – just enable the "Enable close button" option in the plugin settings.
+
+= Can I make the notice stay hidden after closing? =
+Yes – enable the "Remember closure with cookie" option. When a user closes the notice, it will stay hidden until the cookie expires or is cleared.
+
 Example:
 `.simsino-myw-notice { font-family: Arial; border-radius: 10px; }`
 
@@ -59,6 +67,10 @@ Yes – choose the "Bottom position" option in the plugin settings.
 2. Settings panel inside the WordPress dashboard
 
 == Changelog ==
+
+= 1.2.0 =
+* Added option to enable a close button for the notice bar
+* Added option to remember closure state using a cookie
 
 = 1.1.4 =
 * Added "Show only on desktop" option to hide the notice bar on mobile devices
@@ -84,6 +96,10 @@ Yes – choose the "Bottom position" option in the plugin settings.
 * Initial release
 
 == Upgrade Notice ==
+
+= 1.2.0 =
+* Added option to enable a close button for the notice bar
+* Added option to remember closure state using a cookie
 
 = 1.1.4 =
 Adds option to hide notice on mobile and allows custom CSS styling via settings.
